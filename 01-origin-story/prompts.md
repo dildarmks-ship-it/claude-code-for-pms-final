@@ -24,6 +24,12 @@ built from your own questions.
 
 ### 1.
 
+To enhance the product after the last release can you site the issues the product is facing and what are the top 3 items that my team should focus and fix
+
 ### 2.
+
+```
+What's contradictory or missing, not just in the company documents, but across everything in 00-rook?
+```
 
 ### 3.
