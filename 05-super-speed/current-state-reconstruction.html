@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dispatch Today</title>
+<meta name="description" content="Reconstruction of the current Dispatch handler console and responder phone app (4.2), built only from interviews, tickets, one-pagers and release notes. Every element is sourced.">
+<style>
+:root{
+  --bg:#f4f3ef; --panel:#fff; --ink:#1c1c1a; --muted:#6b6a64; --line:#e2e0d8;
+  --pin:#2f5d8a; --pin-ink:#fff; --unk:#9a6a12; --unk-soft:#fbf1dc;
+  --busy:#a33a2a; --busy-soft:#f9e4e0; --ok:#2c6e49; --ok-soft:#e1f1e7;
+  --phone:#111214; --phone-ink:#f2f2f0; --phone-muted:#9a9a96; --phone-card:#1e2023;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141413; --panel:#1d1d1b; --ink:#ecebe6; --muted:#a09f98; --line:#33322e;
+    --pin:#8fb6dc; --pin-ink:#111; --unk:#e0b35a; --unk-soft:#33291a;
+    --busy:#e58a7a; --busy-soft:#3a221e; --ok:#7fc79d; --ok-soft:#1c3226;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141413; --panel:#1d1d1b; --ink:#ecebe6; --muted:#a09f98; --line:#33322e;
+  --pin:#8fb6dc; --pin-ink:#111; --unk:#e0b35a; --unk-soft:#33291a;
+  --busy:#e58a7a; --busy-soft:#3a221e; --ok:#7fc79d; --ok-soft:#1c3226;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1140px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:22px;margin:0 0 4px} h2{font-size:17px;margin:32px 0 10px}
+.sub{color:var(--muted);margin:0 0 12px;max-width:760px}
+.warn{background:var(--unk-soft);border-left:3px solid var(--unk);padding:10px 12px;border-radius:8px;font-size:14px;max-width:760px;margin-bottom:20px}
+.label{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 8px}
+.stage{display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start}
+@media (max-width:860px){.stage{grid-template-columns:1fr}.phone{margin:0 auto}}
+/* pins */
+.pin{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--pin);color:var(--pin-ink);font-size:11px;font-weight:700;cursor:pointer;border:0;vertical-align:middle;margin-left:4px}
+.pin.unk{background:var(--unk);color:#111}
+.pin:focus-visible,.pin.hl{outline:3px solid var(--ink);outline-offset:1px}
+/* console: intentionally light-only, matching today's product (no dark mode) */
+.console{background:#fff;color:#1c1c1a;border:1px solid #d9d7cf;border-radius:12px;overflow:hidden;font-size:13px}
+.console .muted{color:#77766f}
+.ctop{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid #e6e4dc;background:#fafaf7}
+.tab{padding:5px 10px;border-radius:6px;color:#55544e}
+.tab.on{background:#e9eef4;color:#1f3e5c;font-weight:600}
+.filter{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.chip{border:1px solid #d9d7cf;border-radius:999px;padding:2px 8px;font-size:12px;background:#fff}
+.cbody{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px}
+@media (max-width:600px){.cbody{grid-template-columns:1fr}}
+.card{border:1px solid #e6e4dc;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;background:#fff}
+.card h3{margin:0;font-size:15px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.badge{font-size:10px;padding:1px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.03em}
+.badge.avail{background:#e1f1e7;color:#2c6e49} .badge.eng{background:#f9e4e0;color:#a33a2a}
+.tags{display:flex;gap:4px;flex-wrap:wrap}
+.gap{border:1px dashed #cfccc1;border-radius:6px;padding:8px;color:#8a887f;font-size:12px}
+.side{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 12px}
+.btn{border:1px solid #cfccc1;border-radius:6px;padding:5px 9px;background:#fff;font-size:12px;color:#33322e}
+.activity{border-top:1px solid #e6e4dc;padding:10px 12px;background:#fafaf7}
+.activity div{padding:2px 0}
+/* phone */
+.phone{width:290px;background:var(--phone);color:var(--phone-ink);border-radius:34px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);border:1px solid #2a2b2e}
+.screen{background:#0b0c0d;border-radius:24px;min-height:500px;padding:16px 14px;display:flex;flex-direction:column;gap:12px;font-size:14px}
+.pstatus{display:flex;justify-content:space-between;font-size:12px;color:var(--phone-muted)}
+.pwho b{display:block;font-size:17px} .pwho{color:var(--phone-muted);font-size:13px}
+.avail{display:inline-flex;align-items:center;gap:6px;color:#8fd3a8;font-size:12px}
+.avail:before{content:"";width:8px;height:8px;border-radius:50%;background:#4cc27a}
+.pcard{background:var(--phone-card);border-radius:14px;padding:12px}
+.pcard .m{color:var(--phone-muted);font-size:13px}
+.offer{background:#1d2f44;border:1px solid #3c6a99}
+.pbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.pbtns span{border-radius:10px;padding:10px;text-align:center;font-weight:600}
+.acc{background:#4cc27a;color:#062512} .dec{background:#2a2c30}
+.pempty{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;color:#5d5e60}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel);margin-bottom:10px}
+.seg button{border:0;background:transparent;color:var(--ink);padding:7px 12px;font:inherit;font-size:13px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--pin);color:var(--pin-ink)}
+/* source table */
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+tr.hl td{background:var(--unk-soft)}
+td.n{width:44px}
+.tablewrap{overflow-x:auto}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:0 0 16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Dispatch today (4.2): reconstructed</h1>
+  <p class="sub">What the handler console and the responder's phone look like now, as far as our own documents describe them. It's here to compare against the Back in Rotation mock.</p>
+  <div class="warn"><strong>This is not a screenshot.</strong> There are no screenshots, design files or front-end code for either interface in this repo. Every element below comes from an interview, ticket, one-pager or release note. Layout, colours and wording are placeholders. Ask Sofia for the real screens before this goes further.</div>
+  <div class="legend"><span><span class="pin" tabindex="-1">1</span> described in a source</span><span><span class="pin unk" tabindex="-1">?</span> not described anywhere, so unknown</span><span>Click a marker to highlight its source.</span></div>
+
+  <div class="stage">
+    <section>
+      <p class="label">Handler console: web, desktop only <button class="pin" data-s="1">1</button></p>
+      <div class="console">
+        <div class="ctop">
+          <span class="tab on">Coverage</span><button class="pin" data-s="2">2</button>
+          <span class="tab">Incident feed</span>
+          <span class="tab">Activity</span><button class="pin" data-s="9">9</button>
+          <div class="filter"><span class="muted">Filter:</span><span class="chip">structural-entry</span><span class="chip">flight</span><button class="pin" data-s="3">3</button></div>
+        </div>
+        <div class="cbody">
+          <article class="card">
+            <div class="row"><h3>Meteor Mite</h3><span><span class="badge avail">Available</span><button class="pin" data-s="4">4</button></span></div>
+            <div class="tags"><span class="chip">cold-weather</span><span class="chip">flight</span><button class="pin" data-s="5">5</button></div>
+            <div class="gap">Offer history, weekly volume, or why it's quiet: <strong>not shown anywhere we know of</strong> <button class="pin unk" data-s="10">?</button></div>
+          </article>
+          <article class="card">
+            <div class="row"><h3>The Gale</h3><span><span class="badge eng">Engaged</span><button class="pin" data-s="4">4</button></span></div>
+            <div class="tags"><span class="chip">structural-entry</span><span class="chip">aquatic</span><button class="pin" data-s="5">5</button></div>
+            <div class="gap">Same card, same fields. Kip: the two cards "might as well be two different products." <button class="pin" data-s="11">11</button></div>
+          </article>
+        </div>
+        <div class="side">
+          <span class="btn">Responder detail ▸</span><button class="pin" data-s="6">6</button>
+          <span class="btn">Tag legend (drawer)</span><button class="pin" data-s="6">6</button>
+          <span class="btn">Override routing</span><button class="pin" data-s="7">7</button>
+          <span class="btn">Edit availability / tags</span><button class="pin" data-s="7">7</button>
+        </div>
+        <div class="activity muted">
+          <div>🔔 Same chime for every responder <button class="pin" data-s="8">8</button></div>
+          <div>Live callout listing: easy to miss, and it moves on before the handler notices <button class="pin" data-s="12">12</button></div>
+        </div>
+      </div>
+      <p class="sub" style="margin-top:8px;font-size:13px">Light theme only. There's no dark mode today <button class="pin" data-s="8">8</button></p>
+    </section>
+
+    <section>
+      <p class="label">Responder's phone</p>
+      <div class="seg" role="group" aria-label="Phone state">
+        <button data-p="quiet" aria-pressed="true">Quiet</button>
+        <button data-p="offer" aria-pressed="false">Offer</button>
+        <button data-p="gone" aria-pressed="false">Gone</button>
+      </div>
+      <div class="phone"><div class="screen" id="screen"></div></div>
+    </section>
+  </div>
+
+  <h2>Sources</h2>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>#</th><th>What we know</th><th>Where it comes from</th></tr></thead>
+    <tbody id="sources"></tbody>
+  </table>
+  </div>
+</div>
+
+<script>
+const S={
+  1:["Console is web and desktop only. Handlers have no phone app (it's being explored for Q4, not staffed).","dispatch-one-pager.pdf; 06-sidekicks/briefs/handler-phone-app.txt; roadmap-q3.pdf"],
+  2:["There's a coverage view and an incident feed. Handlers with two responders see two coverage cards side by side.","interviews: ambrose.txt, kip.txt"],
+  3:["Capability-tag filter. It persists between sessions since 4.2, but has silently reset to the default view at least twice.","release-history.pdf (4.2); ambrose.txt"],
+  4:["Each card has a status badge (engaged / available). The text is too small to read at a glance.","ambrose.txt; aunt-dot.txt"],
+  5:["Responders carry capability tags (flight, structural-entry, hazmat-tolerant, cold-weather, aquatic, crowd-management, de-escalation). The tags on each card here are placeholders.","glossary.docx"],
+  6:["Responder detail panel / profile (redesigned in 4.0). The capability tag legend sits in a drawer off it.","ambrose.txt; halloran.txt; release-history.pdf (4.0)"],
+  7:["Handlers can override routing to hand-pick a responder, and manage availability windows and capability tags.","dispatch-one-pager.pdf"],
+  8:["A single chime, the same for every responder. No dark mode.","kip.txt; aunt-dot.txt"],
+  9:["There's an activity view. Whether it logs overrides is disputed: 4.0's release notes say an override audit log shipped, while the March brief says overrides leave no trace.","routing-override-audit-log.txt; release-history.pdf (4.0)"],
+  10:["UNKNOWN. No source says the console shows a responder's offer count, history or reason for going quiet. Handlers track it themselves (Renata compares against last year \"out of habit\"; Teresa noticed nine days of silence).","t-008.txt; t-014.txt (evidence of absence, not proof)"],
+  11:["Kip can see the two cards telling \"wildly different stories\" but nothing explains why.","kip.txt"],
+  12:["By the time a handler notices a live callout, it has often already moved on. Handlers hear about misses from the responder, not the console.","ambrose.txt; t-001.txt"],
+  13:["Push notification, then open the app, then Accept / Decline. The offer window is 60s (was 90s).","release-history.pdf (4.2); config.py; offer.py"],
+  14:["When the window closes, the offer is withdrawn from the phone: it has \"gone to someone else\". The exact on-screen wording is unknown.","offer.py (withdraw_from_device); t-003, t-015, t-019, t-025"],
+  15:["Responders set their own availability in the app.","dispatch-one-pager.pdf; availability.py"],
+  16:["No way for a responder to see their own history. A quiet week looks identical to a broken app.","t-008.txt (\"there isn't, not on her end\"); t-017.txt (\"app just dead\")"],
+};
+function pin(n,unk){return `<button class="pin${unk?' unk':''}" data-s="${n}">${unk?'?':n}</button>`}
+document.getElementById('sources').innerHTML=Object.entries(S).map(([n,[w,src]])=>`<tr id="s${n}"><td class="n">${pin(n,n==10)}</td><td>${w}</td><td class="muted" style="color:var(--muted)">${src}</td></tr>`).join('');
+
+const head=`<div class="pstatus"><span>23:41</span><span>Rook</span></div><div class="pwho"><b>Meteor Mite</b><span class="avail">Available</span> ${pin(15)}</div>`;
+const P={
+  quiet: head+`<div class="pempty">No callouts.<br><br><span style="font-size:12px">No history, no explanation.</span></div><div style="font-size:12px;color:var(--phone-muted)">Nothing tells the responder whether it's the app, the phone or them ${pin(16)}</div>`,
+  offer: head+`<div class="pcard offer"><div><b>Callout</b> ${pin(13)}</div><div class="m">Incident details · placeholder</div><div style="font-size:28px;font-weight:700;text-align:center;margin:8px 0">60s</div><div class="pbtns"><span class="dec">Decline</span><span class="acc">Accept</span></div></div><div class="m" style="font-size:12px;color:var(--phone-muted)">Whether a countdown is shown is unknown ${pin('?',1).replace('data-s="?"','data-s="14"')}</div>`,
+  gone: head+`<div class="pcard"><b>Gone to someone else</b> ${pin(14)}<div class="m">Wording is a placeholder. A timeout and a decline count the same against the score, and nothing on screen says so.</div></div>`
+};
+const screen=document.getElementById('screen');
+function show(p){screen.innerHTML=P[p];document.querySelectorAll('[data-p]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===p))}
+document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>show(b.dataset.p));
+show('quiet');
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.pin[data-s]'); if(!b) return;
+  const n=b.dataset.s;
+  document.querySelectorAll('.pin.hl,tr.hl').forEach(x=>x.classList.remove('hl'));
+  document.querySelectorAll(`.pin[data-s="${n}"]`).forEach(x=>x.classList.add('hl'));
+  const row=document.getElementById('s'+n); if(row){row.classList.add('hl');row.scrollIntoView({behavior:'smooth',block:'center'})}
+});
+</script>
+</body>
+</html>

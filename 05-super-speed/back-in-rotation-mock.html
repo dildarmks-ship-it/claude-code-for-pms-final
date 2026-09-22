@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Back in Rotation</title>
+<meta name="description" content="A three-step walkthrough of what Kip and Meteor Mite see today versus with Back in Rotation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --ground:#eef1ee; --panel:#ffffff; --panel-2:#f6f8f6; --ink:#16201f; --muted:#5f6b69; --line:#d9dfdb;
+  --accent:#1f6f6a; --accent-ink:#ffffff; --accent-soft:#dcefec;
+  --quiet:#9a6412; --quiet-soft:#f8ecd6;
+  --busy:#b0432f; --busy-soft:#f7e2dc;
+  --ok:#2d7a4b; --ok-soft:#dff1e5;
+  --new:#6b4bb8; --new-soft:#ece6fa;
+  --phone:#0f1312; --phone-screen:#070909; --phone-card:#1a2120; --phone-ink:#eef2f0; --phone-muted:#8e9a97;
+  --shadow:0 1px 2px rgba(22,32,31,.06), 0 8px 24px rgba(22,32,31,.08);
+  --display:"Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --body:"Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --ground:#0e1413; --panel:#172020; --panel-2:#1c2625; --ink:#e6ecea; --muted:#9aa7a4; --line:#2a3634;
+    --accent:#5cc0b6; --accent-ink:#06201d; --accent-soft:#16312e;
+    --quiet:#e3a948; --quiet-soft:#33291a;
+    --busy:#ec8a76; --busy-soft:#3a231e;
+    --ok:#7fcf9c; --ok-soft:#18302a;
+    --new:#b9a2f2; --new-soft:#2a2340;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --ground:#0e1413; --panel:#172020; --panel-2:#1c2625; --ink:#e6ecea; --muted:#9aa7a4; --line:#2a3634;
+  --accent:#5cc0b6; --accent-ink:#06201d; --accent-soft:#16312e;
+  --quiet:#e3a948; --quiet-soft:#33291a;
+  --busy:#ec8a76; --busy-soft:#3a231e;
+  --ok:#7fcf9c; --ok-soft:#18302a;
+  --new:#b9a2f2; --new-soft:#2a2340;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font:16px/1.5 var(--body)}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:32px 56px}
+button{font:inherit;color:inherit}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* header */
+.eyebrow{font:600 12px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+h1{font:700 clamp(28px,4.4vw,40px)/1.1 var(--display);margin:0 0 10px;text-wrap:balance;letter-spacing:-.01em}
+.lede{font-size:17px;color:var(--muted);max-width:62ch;margin:0 0 24px}
+.lede b{color:var(--ink);font-weight:600}
+
+/* mode switch */
+.switch{display:inline-grid;grid-template-columns:1fr 1fr;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px;margin-bottom:22px}
+.switch button{border:0;background:transparent;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:600;font-size:15px;color:var(--muted)}
+.switch button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+.switch button.new[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+
+/* step track */
+.track{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;list-style:none;padding:0;margin:0 0 18px}
+.track li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:14px;cursor:pointer}
+.track li .n{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:700 12px/1 var(--mono);background:var(--panel-2);border:1px solid var(--line)}
+.track li.done .n{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.track li.on{border-color:var(--accent);color:var(--ink);font-weight:600;box-shadow:var(--shadow)}
+.track li.on .n{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+@media (max-width:560px){.track li{font-size:12.5px;padding:8px}.track li .n{width:20px;height:20px}}
+
+/* story caption */
+.story{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;box-shadow:var(--shadow)}
+.story p{margin:0;flex:1 1 360px;font-size:17px;max-width:66ch}
+.story p b{font-weight:600}
+.cta{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:11px 18px;border-radius:12px;cursor:pointer;font-weight:600;font-size:15px}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.warn{border-color:var(--line);background:var(--panel-2);color:var(--ink)}
+
+/* stage */
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+@media (max-width:860px){.stage{grid-template-columns:1fr}.phonecol{justify-self:center}}
+.who{font:600 12px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+
+/* console */
+.console{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow)}
+.cbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted);background:var(--panel-2)}
+.cbar b{color:var(--ink);font-weight:600}
+.cards{display:grid;grid-template-columns:1.35fr 1fr;gap:14px;padding:16px}
+@media (max-width:620px){.cards{grid-template-columns:1fr}}
+.card{border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--panel)}
+.card.focus{border-color:var(--quiet)}
+.card.focus.live{border-color:var(--accent)}
+.card.focus.good{border-color:var(--ok)}
+.chead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.chead h3{margin:0;font:700 19px/1.2 var(--display)}
+.status{font:600 12px/1 var(--body);padding:6px 10px;border-radius:999px;white-space:nowrap}
+.s-avail{background:var(--panel-2);color:var(--muted);border:1px solid var(--line)}
+.s-quiet{background:var(--quiet-soft);color:var(--quiet)}
+.s-live{background:var(--accent-soft);color:var(--accent)}
+.s-busy{background:var(--busy-soft);color:var(--busy)}
+.s-ok{background:var(--ok-soft);color:var(--ok)}
+.why{border-radius:12px;background:var(--quiet-soft);padding:14px;display:flex;flex-direction:column;gap:10px;position:relative}
+.why.live{background:var(--accent-soft)} .why.good{background:var(--ok-soft)} .why.plain{background:var(--panel-2)}
+.why h4{margin:0;font:600 15px/1.3 var(--body)}
+.why p{margin:0;font-size:14px;color:var(--ink)}
+.why .muted{color:var(--muted)}
+.newtag{display:inline-flex;align-items:center;gap:4px;font:600 10.5px/1 var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--new);background:var(--new-soft);padding:4px 7px;border-radius:6px;align-self:flex-start}
+.empty{border:1.5px dashed var(--line);border-radius:12px;padding:14px;color:var(--muted);font-size:14px}
+/* chart */
+.chart{display:flex;flex-direction:column;gap:6px}
+.chart svg{width:100%;height:64px;display:block;overflow:visible}
+.chart .axis{display:flex;justify-content:space-between;font:500 11px/1 var(--mono);color:var(--muted)}
+.gale-line{font-size:14px;color:var(--muted)}
+.gale-line b{font:700 22px/1 var(--mono);color:var(--busy)}
+/* sms */
+.sms{display:flex;flex-direction:column;gap:6px;padding:0 16px 16px}
+.bubble{max-width:80%;padding:9px 12px;border-radius:14px;font-size:14px;line-height:1.35}
+.bubble.them{background:var(--panel-2);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.bubble.me{background:var(--ink);color:var(--panel);align-self:flex-end;border-bottom-right-radius:4px}
+.bubble small{display:block;font-size:11px;opacity:.65;margin-bottom:2px}
+
+/* phone */
+.phone{width:290px;max-width:100%;background:var(--phone);border-radius:40px;padding:12px;box-shadow:0 20px 50px rgba(0,0,0,.28);border:1px solid #28302e}
+.screen{background:var(--phone-screen);color:var(--phone-ink);border-radius:30px;min-height:520px;padding:18px 16px 20px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden}
+.notch{width:90px;height:22px;border-radius:12px;background:#000;margin:-6px auto 2px}
+.pid b{display:block;font:700 20px/1.2 var(--display)}
+.pdot{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#8fd9a9}
+.pdot:before{content:"";width:8px;height:8px;border-radius:50%;background:#48c47a}
+.pcard{background:var(--phone-card);border-radius:18px;padding:14px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+.pcard .t{font-weight:600;font-size:15px}
+.pcard .m{color:var(--phone-muted);font-size:13px}
+.pcard.rot{background:linear-gradient(160deg,#153a37,#10302d);border:1px solid #2b6b64}
+.pcard.offer{background:#11283a;border:1px solid #2f6690}
+.pcard.good{background:#133222;border:1px solid #2f7a4d}
+.pnew{font:600 10px/1 var(--body);letter-spacing:.06em;text-transform:uppercase;color:#cbb9ff}
+.silence{flex:1;display:grid;place-items:center;text-align:center;color:#56605e;font-size:14px}
+.ring{position:relative;width:120px;height:120px;margin:6px auto}
+.ring svg{transform:rotate(-90deg)}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;font:700 30px/1 var(--mono)}
+.pbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.pbtns button{border:0;border-radius:14px;padding:13px;font-weight:600;cursor:pointer}
+.pacc{background:#48c47a;color:#062512}
+.pdec{background:#2a3230;color:var(--phone-ink)}
+
+.foot{margin-top:28px;font-size:13px;color:var(--muted);max-width:80ch;display:flex;flex-direction:column;gap:6px}
+.foot b{color:var(--ink);font-weight:600}
+.legend{display:inline-flex;align-items:center;gap:6px}
+
+/* roster */
+.roster{margin-top:48px;padding-top:32px;border-top:1px solid var(--line)}
+.roster h2{font:700 clamp(22px,3vw,28px)/1.15 var(--display);margin:0 0 8px;text-wrap:balance}
+.tally{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+@media (max-width:560px){.tally{grid-template-columns:1fr}}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;align-items:baseline;gap:10px}
+.tile b{font:700 30px/1 var(--mono)}
+.tile span{font-size:14px;color:var(--muted)}
+.tile.q b{color:var(--quiet)} .tile.d b{color:var(--muted)} .tile.u b{color:var(--busy)}
+.groups{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media (max-width:860px){.groups{grid-template-columns:1fr}}
+.group{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.group.quiet{border-color:var(--quiet)}
+.group.busy{grid-row:span 2}
+.ghead{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.ghead h3{margin:0;font:700 17px/1.2 var(--display);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ghead p{margin:0;font-size:14px;color:var(--muted)}
+.group.quiet .ghead{background:var(--quiet-soft)}
+.rows{list-style:none;margin:0;padding:4px 0}
+.rows li{display:grid;grid-template-columns:minmax(0,1fr) 84px 92px;gap:12px;align-items:center;padding:9px 16px}
+.rows li+li{border-top:1px solid var(--line)}
+.rows li.kip{background:var(--panel-2)}
+.rname b{display:block;font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rname span{font-size:12.5px;color:var(--muted)}
+.rows svg{width:84px;height:26px;display:block;overflow:visible}
+.rnum{font:500 13px/1.2 var(--mono);text-align:right;white-space:nowrap}
+.rnum b{font-weight:700;font-size:15px}
+.quiet .rnum b{color:var(--quiet)} .busy .rnum b{color:var(--busy)}
+.gnote{margin:0;padding:10px 16px 14px;font-size:13px;color:var(--muted);border-top:1px solid var(--line)}
+
+@media (prefers-reduced-motion: no-preference){
+  .fade{animation:fade .35s ease both}
+  @keyframes fade{from{opacity:.001;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .ring circle.fg{transition:stroke-dashoffset 1s linear}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Dispatch · proposal for Helen</p>
+  <h1>Back in Rotation</h1>
+  <p class="lede">When a responder goes quiet, nothing brings them back, because <b>being quiet is exactly what stops them being asked.</b> Follow Kip and Meteor Mite through one callout, first as it works today and then with the change.</p>
+
+  <div class="switch" role="group" aria-label="Which version">
+    <button id="mToday" aria-pressed="false">Today</button>
+    <button id="mNew" class="new" aria-pressed="true">With Back in Rotation</button>
+  </div>
+
+  <ol class="track" id="track" aria-label="Steps"></ol>
+
+  <div class="story" aria-live="polite">
+    <p id="story"></p>
+    <div class="cta" id="cta"></div>
+  </div>
+
+  <div class="stage">
+    <section>
+      <p class="who">Kip's console <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">· handler for two responders</span></p>
+      <div class="console">
+        <div class="cbar"><span><b>Coverage</b> · Kip's responders</span><span id="clock">23:41</span></div>
+        <div class="cards">
+          <article class="card focus" id="miteCard"></article>
+          <article class="card" id="galeCard"></article>
+        </div>
+        <div class="sms" id="sms"></div>
+      </div>
+    </section>
+    <section class="phonecol">
+      <p class="who">Meteor Mite's phone</p>
+      <div class="phone"><div class="screen" id="screen"></div></div>
+    </section>
+  </div>
+
+  <section class="roster" aria-labelledby="rosterTitle">
+    <p class="eyebrow">Beyond Kip</p>
+    <h2 id="rosterTitle">How all 16 responders are doing</h2>
+    <p class="lede">Offers per week before 4.2 compared with the latest week (31 Aug). Mite isn't alone, and the callouts they lost didn't disappear. They went to the other ten, and the busiest got busier still.</p>
+    <div class="tally" id="tally"></div>
+    <div class="groups" id="groups"></div>
+  </section>
+
+  <div class="foot">
+    <span class="legend"><span class="newtag">New</span> marks what Back in Rotation adds. Everything else is what exists today.</span>
+    <span><b>Real:</b> the weekly offer counts in the chart come from callout-history.csv, 29 Jun – 31 Aug. <b>Illustrative:</b> the callout, the times and the exact wording.</span>
+    <span><b>Today's console</b> is reconstructed from handler interviews, not screenshots. <b>Still open:</b> whether High-severity callouts should skip the "first in line" rule.</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Weekly offers, callout-history.csv. 4.2 shipped in the week of 10 Aug (index 6).
+  var MITE=[11,12,10,11,12,11,10,4,2,1];
+  var GALE=[13,12,13,14,13,13,15,17,20,21];
+  var $=function(id){return document.getElementById(id)};
+  var mode='new', step=0, outcome=null, timer=null, left=60;
+
+  var STEPS={
+    today:['Mite goes quiet','A callout comes in','What happens next'],
+    new:['Quiet gets noticed','Mite is asked first','Mite answers']
+  };
+
+  function chart(){
+    var w=300,h=64,max=22,n=MITE.length,bw=w/n;
+    var bars=MITE.map(function(v,i){
+      var bh=Math.max(3,v/max*(h-12)), x=i*bw+3, y=h-bh;
+      var after=i>=6;
+      return '<rect x="'+x+'" y="'+y+'" width="'+(bw-6)+'" height="'+bh+'" rx="3" fill="'+(after?'var(--quiet)':'var(--muted)')+'" opacity="'+(after?1:.35)+'"><title>'+v+' offers</title></rect>';
+    }).join('');
+    var rx=6*bw;
+    return '<div class="chart"><svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" role="img" aria-label="Meteor Mite weekly offers: about 11 a week until mid-August, then 4, 2, 1">'+
+      '<line x1="'+rx+'" y1="0" x2="'+rx+'" y2="'+h+'" stroke="var(--line)" stroke-dasharray="3 3"/>'+bars+'</svg>'+
+      '<div class="axis"><span>Jul</span><span>4.2 ships ▸</span><span>31 Aug</span></div></div>';
+  }
+
+  var HEAD='<div class="notch"></div><div class="pid"><b>Meteor Mite</b><span class="pdot">Available</span></div>';
+
+  function ring(){
+    var r=52,c=2*Math.PI*r;
+    return '<div class="ring"><svg width="120" height="120"><circle cx="60" cy="60" r="'+r+'" stroke="#223a50" stroke-width="8" fill="none"/>'+
+      '<circle class="fg" id="arc" cx="60" cy="60" r="'+r+'" stroke="#6fb3e6" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="0"/></svg>'+
+      '<div class="num" id="secs">60</div></div>';
+  }
+
+  function render(){
+    clearInterval(timer);
+    $('mToday').setAttribute('aria-pressed',mode==='today');
+    $('mNew').setAttribute('aria-pressed',mode==='new');
+    $('track').innerHTML=STEPS[mode].map(function(t,i){
+      return '<li data-step="'+i+'" class="'+(i===step?'on':(i<step?'done':''))+'"><span class="n">'+(i+1)+'</span>'+t+'</li>';
+    }).join('');
+
+    var story='',cta=[],mite='',gale='',sms='',screen='',miteCls='card focus',clock='23:41';
+    var galeLine='<div class="gale-line">Getting a lot of callouts. Tired.</div>';
+    var galeBase=function(status,cls){return '<div class="chead"><h3>The Gale</h3><span class="status '+cls+'">'+status+'</span></div>'+galeLine};
+
+    if(mode==='today'){
+      gale=galeBase('Engaged','s-busy');
+      if(step===0){
+        mite='<div class="chead"><h3>Meteor Mite</h3><span class="status s-avail">Available</span></div>'+
+             '<div class="empty">Same card as always. Nothing says Mite has gone quiet, or why.</div>';
+        sms='<div class="bubble them"><small>Mite</small>is something broken? it\'s so quiet</div>';
+        screen=HEAD+'<div class="silence">No callouts.</div>';
+        story='<b>Mite has almost stopped getting callouts.</b> Kip only finds out because Mite texts to ask what\'s wrong. The console looks normal.';
+        cta=[['Next','next']];
+      } else if(step===1){
+        mite='<div class="chead"><h3>Meteor Mite</h3><span class="status s-avail">Available</span></div>'+
+             '<div class="empty">Mite is nearby and free, but isn\'t asked.</div>';
+        gale=galeBase('Offer on phone','s-live');
+        screen=HEAD+'<div class="silence">No callouts.</div>';
+        story='<b>A callout comes in near Mite.</b> It goes to The Gale instead, because missed offers pushed Mite to the bottom of the list. Mite never sees it.';
+        cta=[['Next','next']];
+      } else {
+        mite='<div class="chead"><h3>Meteor Mite</h3><span class="status s-avail">Available</span></div>'+
+             '<div class="empty">Still quiet. Nothing on screen will change that.</div>';
+        sms='<div class="bubble them"><small>Mite</small>still nothing…</div><div class="bubble me"><small>Kip</small>hang in there, it\'ll pick up</div>';
+        screen=HEAD+'<div class="silence">No callouts.</div>';
+        story='<b>It won\'t pick up.</b> With no offers, Mite can\'t accept any, so their place in line can never recover. Kip has nothing better to say.';
+        cta=[['See it with Back in Rotation','switch'],['Start over','restart','ghost']];
+      }
+    } else {
+      gale=galeBase('Engaged','s-busy');
+      var why='<div class="why"><span class="newtag">New</span><h4>Quiet: 3 offers in 2 weeks</h4>'+chart()+
+              '<p>Usually about 11 a week. Missed offers pushed Mite down the list. <b>The next matching callout goes to Mite first.</b></p></div>';
+      if(step===0){
+        mite='<div class="chead"><h3>Meteor Mite</h3><span class="status s-quiet">Quiet</span></div>'+why;
+        sms='<div class="bubble me"><small>Kip</small>you\'re first in line for the next one. keep your phone close</div>';
+        screen=HEAD+'<div class="pcard rot fade"><span class="pnew">New</span><div class="t">You\'re back in rotation</div><div class="m">The next matching callout comes to you first.</div></div><div class="silence">No callouts yet.</div>';
+        story='<b>The console notices Mite has gone quiet, and says why.</b> Mite sees they\'re first in line, and Kip has a real answer to give.';
+        cta=[['Next: a callout comes in','next']];
+      } else if(step===1){
+        miteCls='card focus live';
+        mite='<div class="chead"><h3>Meteor Mite</h3><span class="status s-live">Offer on phone</span></div>'+
+             '<div class="why live"><span class="newtag">New</span><h4>Asked first because Mite has been quiet</h4><p class="muted">Mite still has the usual 60 seconds to answer.</p></div>';
+        screen=HEAD+'<div class="pcard offer fade"><div class="t">New callout</div><div class="m">Structural entry · about 6 min away</div>'+ring()+
+          '<div class="pbtns"><button class="pdec" data-out="decline">Decline</button><button class="pacc" data-out="accept">Accept</button></div></div>'+
+          '<div class="m" style="color:var(--phone-muted);font-size:12px;text-align:center">You\'re back in rotation, so this one came to you first.</div>';
+        story='<b>The next callout goes to Mite first.</b> It\'s a guaranteed ask, not a guaranteed job. Tap Accept or Decline on the phone, or wait for the timer to run out.';
+        cta=[['Accept','accept'],['Let it time out','miss','warn'],['Decline','decline','warn']];
+      } else {
+        clock='23:42';
+        if(outcome==='accept'){
+          miteCls='card focus good';
+          mite='<div class="chead"><h3>Meteor Mite</h3><span class="status s-ok">On a callout</span></div>'+
+               '<div class="why good"><h4>Back in rotation</h4><p>Mite took it. From here Mite is ranked normally, and a bad stretch fades with time instead of sticking.</p></div>';
+          sms='<div class="bubble them"><small>Mite</small>got one!!</div>';
+          screen=HEAD.replace('Available','On a callout')+'<div class="pcard good fade"><div class="t">You\'re on it</div><div class="m">Kip has been told. Welcome back.</div></div>';
+          story='<b>One answer and Mite is back.</b> Kip didn\'t have to do anything.';
+        } else if(outcome==='miss'){
+          mite='<div class="chead"><h3>Meteor Mite</h3><span class="status s-avail">Available</span></div>'+
+               '<div class="why plain"><span class="newtag">New</span><h4>Missed, not declined</h4><p>The callout moved to The Gale after 60 seconds. A miss counts less against Mite than a decline.</p></div>';
+          screen=HEAD+'<div class="pcard fade"><span class="pnew">New</span><div class="t">Missed. It\'s gone to someone else</div><div class="m">A miss doesn\'t count against you the way a decline does.</div></div>';
+          story='<b>The callout was still covered, just 60 seconds later.</b> Mite is told what happened instead of being left to wonder.';
+        } else {
+          mite='<div class="chead"><h3>Meteor Mite</h3><span class="status s-avail">Available</span></div>'+
+               '<div class="why plain"><h4>Declined</h4><p>A decline still counts in full. If Mite is choosing to step back, we respect that.</p></div>';
+          screen=HEAD+'<div class="pcard fade"><div class="t">Declined</div><div class="m">Not free right now? You can set yourself unavailable any time.</div></div>';
+          story='<b>Saying no still means no.</b> Back in Rotation brings back people who want work. It doesn\'t override someone who is stepping back.';
+        }
+        cta=[['Try another answer','retry'],['Compare with today','switch','ghost']];
+      }
+    }
+
+    $('miteCard').className=miteCls;
+    $('miteCard').innerHTML=mite;
+    $('galeCard').innerHTML=gale;
+    $('sms').innerHTML=sms;
+    $('sms').hidden=!sms;
+    $('screen').innerHTML=screen;
+    $('clock').textContent=clock;
+    $('story').innerHTML=story;
+    $('cta').innerHTML=cta.map(function(c){return '<button class="btn '+(c[2]||'')+'" data-act="'+c[1]+'">'+c[0]+'</button>'}).join('');
+
+    if(mode==='new'&&step===1){
+      left=60; var r=52,c=2*Math.PI*r;
+      timer=setInterval(function(){
+        left--; var s=$('secs'),a=$('arc'); if(!s){clearInterval(timer);return}
+        s.textContent=left; a.setAttribute('stroke-dashoffset',String(c*(1-left/60)));
+        if(left<=0){finish('miss')}
+      },1000);
+    }
+  }
+
+  function finish(o){outcome=o;step=2;render()}
+
+  document.addEventListener('click',function(e){
+    var t=e.target.closest('[data-act],[data-out],[data-step]'); if(!t) return;
+    if(t.dataset.out){finish(t.dataset.out);return}
+    if(t.dataset.step!==undefined){
+      var s=+t.dataset.step;
+      if(mode==='new'&&s===2&&!outcome){outcome='accept'}
+      step=s;render();return;
+    }
+    var a=t.dataset.act;
+    if(a==='next'){step++;render()}
+    else if(a==='accept'||a==='miss'||a==='decline'){finish(a)}
+    else if(a==='retry'){step=1;outcome=null;render()}
+    else if(a==='restart'){step=0;outcome=null;render()}
+    else if(a==='switch'){mode=mode==='today'?'new':'today';step=0;outcome=null;render()}
+  });
+  // All responders, weekly offers 29 Jun – 31 Aug (callout-history.csv).
+  var ROSTER=[
+    ["Farlight","Linda Pruitt",[12,12,11,12,13,12,10,3,1,0]],
+    ["The Undertow","Desmond Okafor",[12,11,12,13,12,12,11,4,1,1]],
+    ["Vesper","Aunt Dot",[14,13,15,14,13,14,12,5,2,1]],
+    ["Meteor Mite","Kip",[11,12,10,11,12,11,10,4,2,1]],
+    ["Corporal Ashgrove","Yusuf Demir",[10,11,10,9,10,10,10,8,7,7]],
+    ["Halfmoon","Simone Fischer",[11,10,11,12,11,11,11,9,8,8]],
+    ["Sgt. Bulwark","Halloran",[9,9,10,9,8,9,10,10,11,11]],
+    ["The Longcast","Graham Petrov",[7,7,8,7,7,7,8,8,9,9]],
+    ["The Drift","Beatrice Calloway",[6,6,7,6,6,6,7,7,8,8]],
+    ["Cindermark","Farid Haddad",[9,9,8,10,9,9,10,11,12,12]],
+    ["Nightwell","Marjorie Sung",[15,14,15,16,15,15,16,18,20,21]],
+    ["Stormwrack","Renata Kovač",[13,13,12,14,13,13,14,16,18,19]],
+    ["Ironvale","Teresa Alvarez",[8,8,9,8,7,8,9,10,11,12]],
+    ["Captain Vantage","Mr. Ambrose",[12,13,12,11,12,12,13,15,17,18]],
+    ["Sgt. Falkirk","Owen Bramwell",[10,10,11,10,9,10,11,13,15,16]],
+    ["The Gale","Kip",[13,12,13,14,13,13,15,17,20,21]]
+  ];
+  function spark(s,color){
+    var w=84,h=26,max=22,n=s.length;
+    var pts=s.map(function(v,i){return [(i/(n-1))*w, h-2-(v/max)*(h-4)]});
+    var d=pts.map(function(p,i){return (i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)}).join(' ');
+    var rx=(6/(n-1))*w, last=pts[n-1];
+    return '<svg viewBox="0 0 '+w+' '+h+'" aria-hidden="true"><line x1="'+rx+'" y1="0" x2="'+rx+'" y2="'+h+'" stroke="var(--line)" stroke-dasharray="2 2"/>'+
+      '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>'+
+      '<circle cx="'+last[0]+'" cy="'+last[1]+'" r="2.6" fill="'+color+'"/></svg>';
+  }
+  function groupHtml(cls,title,sub,list,color,note){
+    return '<div class="group '+cls+'"><div class="ghead"><h3>'+title+'</h3><p>'+sub+'</p></div><ul class="rows">'+
+      list.map(function(r){
+        var pre=Math.round(r[2].slice(0,7).reduce(function(a,b){return a+b},0)/7), last=r[2][9];
+        return '<li class="'+(r[1]==='Kip'?'kip':'')+'"><div class="rname"><b>'+r[0]+'</b><span>'+r[1]+'</span></div>'+spark(r[2],color)+
+          '<div class="rnum">~'+pre+' → <b>'+last+'</b><br><span style="color:var(--muted);font-size:11px">a week</span></div></li>';
+      }).join('')+'</ul>'+(note?'<p class="gnote">'+note+'</p>':'')+'</div>';
+  }
+  (function(){
+    var quiet=ROSTER.slice(0,4), dip=ROSTER.slice(4,6), busy=ROSTER.slice(6).reverse();
+    $('tally').innerHTML='<div class="tile q"><b>4</b><span>went quiet (down ~80–90%)</span></div>'+
+      '<div class="tile d"><b>2</b><span>dipped (down ~25%)</span></div>'+
+      '<div class="tile u"><b>10</b><span>got busier (up 17–46%)</span></div>';
+    $('groups').innerHTML=
+      groupHtml('quiet','Went quiet <span class="newtag">Who this is for</span>','11–14 a week before 4.2, 0 or 1 by the end of August. Their handlers get the "Quiet" card, and they get the "back in rotation" message.',quiet,'var(--quiet)',
+        'Vesper and Meteor Mite have no support ticket. We know about them only because their handlers mentioned it in design interviews.')+
+      groupHtml('busy','Got busier','This is where the lost callouts went. The Gale and Nightwell are now at 21 a week.',busy,'var(--busy)',
+        'Ironvale, Stormwrack, Cindermark and others filed "quiet" or "gone before I could answer" tickets even though their weekly numbers rose. Weekly data can\'t explain that yet.')+
+      groupHtml('dip','Dipped','Down about a quarter and holding steady. Not quiet enough to need this, but worth watching.',dip,'var(--muted)');
+  })();
+
+  $('mToday').onclick=function(){mode='today';step=0;outcome=null;render()};
+  $('mNew').onclick=function(){mode='new';step=0;outcome=null;render()};
+  render();
+})();
+</script>
+</body>
+</html>
