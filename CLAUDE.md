@@ -61,3 +61,11 @@ teaching scenario.
 - There are **no screenshots, design files or front-end code** for the console or phone app in this repo. Anything about the current UI is reconstructed. Ask Sofia for real screens. Nothing confirms the console shows offer counts or history today.
 - Supply reads the Responder Availability Record (`availability.py`, `supply-one-pager.pdf`) to schedule maintenance, so any routing change must leave that record's shape alone.
 - Discrepancy: 4.0 release notes list "Audit log for routing overrides" as shipped, but the March brief and my notes say overrides aren't logged. Unresolved; check with Marcus.
+
+### Module 6 — skills, brief review and scheduled runs
+- Project skills live in `.claude/skills/`. `review-checklist` reviews a document against my five checks: named owner, created date **and time**, how we'll know it worked, scope at the end matches the start, problem before fix. It's read-only and never invents a missing owner or date. `save-pm-work` does the end-of-session wrap-up: save prompts to `<module>/prompts.md`, update this file, commit and push.
+- A new session is needed before a newly created skill shows up as a `/command`. Until then, follow its `SKILL.md` by hand.
+- `back-in-rotation-brief.md` now passes 5/5. The owner is Manoj Singh, created 22 Sep 2026 14:28 EDT (from the file's creation time), and "three pieces" means the same thing everywhere. Still open: line 28's re-entry rule has no High-severity exception, even though decision 2 proposes one. Add it if Helen agrees.
+- None of the older briefs in `06-sidekicks/briefs/` would pass checks 1–2: they name a team, not a person, and give a date with no time.
+- Reviewed and edited Mateusz's `~/Documents/brief_matt2.md`, which is outside this repo: added a created date and time taken from the file's creation time, plus a scope note that §2 ships to everyone. My "stop" arrived after those edits were saved. I never confirmed whether to keep them.
+- Scheduled task `monday-brief-review` runs review-checklist on every `*brief*.md` under `repos/`, **once**, on Mon 28 Sep 2026 at 8:00 AM ET. It only runs while the app is open. Two test runs on 24 Sep both succeeded (5/5). It can be switched to weekly.

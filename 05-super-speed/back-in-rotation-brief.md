@@ -1,6 +1,6 @@
 # Back in Rotation — one-pager
 
-To: Helen Achebe · From: PM, Dispatch · 22 September 2026 · Draft for discussion
+To: Helen Achebe · **Owner:** Manoj Singh, PM, Dispatch · **Created:** 22 September 2026, 14:28 EDT · Draft for discussion
 
 > **Click through it:** [`back-in-rotation-mock.html`](back-in-rotation-mock.html) (in the same folder as this brief). Open it in any browser. It walks through one callout for Kip and Meteor Mite, today and with this change, and ends with how all 16 responders are doing.
 
@@ -12,9 +12,9 @@ Kip's two cards show it. Meteor Mite was getting 10–12 offers a week through e
 
 ## Why not just ship the fix this afternoon
 
-The quick fix makes scores recover over time. That's the right change, and it's part of this proposal. On its own, though, nobody would notice it. Kip would still be looking at a silent card with no reason given, Mite would still get silence, and we'd have changed a number and called it handled. What makes this "properly" is the rest: a guaranteed ask for anyone who has gone quiet, a reason on Kip's card, and a message on Mite's phone.
+The quick fix makes scores recover over time. That's the right change, and it's one of the three pieces below. On its own, though, nobody would notice it. Kip would still be looking at a silent card with no reason given, Mite would still get silence, and we'd have changed a number and called it handled. What makes this "properly" is the other two pieces: a guaranteed ask for anyone who has gone quiet, and a missed offer counting less than a decline. All three show up where people can see them, as a reason on Kip's card and a message on Mite's phone.
 
-**Recommendation:** ship all three pieces together, after Wen confirms the mechanism. The four responders who are stuck shouldn't wait on that. This week their handlers can hand-pick them for callouts using the override the console already has, and Nadia's team can contact the handlers directly. That needs no code change.
+**Recommendation:** ship all three pieces together, after Wen confirms the mechanism. The four responders who are stuck shouldn't wait on that. This week their handlers can hand-pick them for callouts using the override the console already has, and Nadia's team can contact the handlers directly. Neither needs a code change. Wen could also reset those four scores once by hand. That's a one-off data change, not a change to the scoring code, and it's decision 3 below.
 
 ## Who it's for
 
@@ -22,6 +22,8 @@ The quick fix makes scores recover over time. That's the right change, and it's 
 - **Secondary: the responder who has gone quiet.** They are still marked available and still willing, but they've fallen to the bottom of the list and can't climb back up.
 
 ## What we'd build
+
+Three pieces, shipped together. Each one shows up on Kip's console and Mite's phone (see the next section).
 
 1. **Being quiet gets you asked.** A responder who is marked available but hasn't had an offer in 7 days gets the next matching callout within range first. This is a guaranteed ask, not a guaranteed job. If they take it, they're back. If they miss it, the callout moves on in seconds, just as it does today. *(Pre-4.2 every responder got 8+ offers a week, so a silent available week is abnormal, not unlucky.)*
 2. **A bad stretch fades with time.** The acceptance score drifts back toward neutral as days pass, so it no longer takes new accepts to recover. That answers Wen's 2019 TODO with "yes, by time." Time is the only thing that reaches someone who is getting no offers at all.
@@ -54,7 +56,7 @@ The quick fix makes scores recover over time. That's the right change, and it's 
 
 1. **Timing:** hold the quick fix and ship all three pieces together, using manual overrides as a bridge until then? I recommend yes.
 2. **High-severity callouts:** should re-entry offers skip them? The Undertow's one offer on 31 Aug was the High-severity T-019, and it was lost almost instantly. I recommend skipping them.
-3. **The four already at the floor:** a one-time reset now, or let re-entry reach them over the next week? I recommend the reset now. It's Wen's call.
+3. **The four already at the floor:** a one-time data reset of their scores now, or let re-entry reach them once it ships? I recommend the reset now. It's Wen's call.
 4. **Nadia:** Vesper and Meteor Mite have no tickets on file. Support should hear about them before handlers see the new card copy.
 
 *Confidence: who is affected is high confidence (row-level data plus interviews). The scoring mechanism as the cause is medium confidence: it's confirmed in the code and fits the timing, but no score history is logged. Wen should confirm it before we build.*
