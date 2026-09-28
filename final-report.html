@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rook Dispatch Casebook</title>
+<meta name="description" content="Final report for Claude Code for PMs: six modules tracing Rook Dispatch 4.2 from symptoms to the Back in Rotation proposal.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --ground:#eef1ee; --panel:#ffffff; --panel-2:#f5f7f5; --ink:#16201f; --muted:#5d6967; --line:#d8dedb;
+  --accent:#1f6f6a; --accent-ink:#ffffff; --accent-soft:#dcefec;
+  --quiet:#9a6412; --quiet-soft:#f8ecd6;
+  --busy:#b0432f; --busy-soft:#f7e2dc;
+  --ok:#2d7a4b; --ok-soft:#dff1e5;
+  --display:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;
+  --body:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --ground:#0e1413; --panel:#172020; --panel-2:#1c2625; --ink:#e6ecea; --muted:#9aa7a4; --line:#2b3735;
+    --accent:#5cc0b6; --accent-ink:#06201d; --accent-soft:#16312e;
+    --quiet:#e3a948; --quiet-soft:#33291a;
+    --busy:#ec8a76; --busy-soft:#3a231e;
+    --ok:#7fcf9c; --ok-soft:#18302a;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --ground:#0e1413; --panel:#172020; --panel-2:#1c2625; --ink:#e6ecea; --muted:#9aa7a4; --line:#2b3735;
+  --accent:#5cc0b6; --accent-ink:#06201d; --accent-soft:#16312e;
+  --quiet:#e3a948; --quiet-soft:#33291a;
+  --busy:#ec8a76; --busy-soft:#3a231e;
+  --ok:#7fcf9c; --ok-soft:#18302a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--ground);color:var(--ink);font:17px/1.5 var(--body);display:flex;flex-direction:column}
+a{color:var(--accent)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.deck{flex:1;min-height:0;position:relative}
+.slide{position:absolute;inset:0;overflow-y:auto;padding-inline:16px;padding-block:36px 28px;display:none}
+.slide.on{display:block}
+.inner{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:22px;min-height:100%;justify-content:center}
+
+.kicker{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font:600 12.5px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.kicker .mod{font-family:var(--mono);letter-spacing:0;background:var(--accent-soft);padding:5px 8px;border-radius:6px}
+h1{font:700 clamp(34px,6vw,64px)/1.02 var(--display);margin:0;letter-spacing:-.02em;text-wrap:balance}
+h2{font:700 clamp(26px,3.6vw,40px)/1.1 var(--display);margin:0;letter-spacing:-.01em;text-wrap:balance;max-width:24ch}
+h3{font:600 17px/1.3 var(--body);margin:0}
+.lede{font-size:clamp(17px,1.6vw,20px);color:var(--muted);max-width:62ch;margin:0}
+.lede b{color:var(--ink);font-weight:600}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.box p{margin:0;font-size:15.5px}
+.box ul{margin:0;padding-left:18px;font-size:15.5px;display:flex;flex-direction:column;gap:6px}
+.label{font:600 11.5px/1 var(--body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.prompt{font:500 14px/1.5 var(--mono);background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0;white-space:pre-wrap;word-break:break-word}
+.prompt cite{display:block;font:500 11.5px/1 var(--body);color:var(--muted);font-style:normal;margin-top:8px}
+.big{font:700 clamp(40px,5vw,56px)/1 var(--mono);letter-spacing:-.02em}
+.big.q{color:var(--quiet)} .big.b{color:var(--busy)} .big.a{color:var(--accent)}
+.stat{display:flex;flex-direction:column;gap:6px}
+.stat span{font-size:14.5px;color:var(--muted)}
+.tag{display:inline-block;font:600 12px/1 var(--body);padding:5px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.tag.q{background:var(--quiet-soft);color:var(--quiet)} .tag.b{background:var(--busy-soft);color:var(--busy)} .tag.ok{background:var(--ok-soft);color:var(--ok)}
+.corr{border-left:3px solid var(--quiet);background:var(--quiet-soft);border-radius:10px;padding:12px 14px;font-size:15px}
+.corr b{font-weight:600}
+.files{display:flex;flex-wrap:wrap;gap:8px}
+.files a{font:500 13.5px/1 var(--mono);text-decoration:none;border:1px solid var(--line);background:var(--panel);padding:8px 10px;border-radius:8px;color:var(--ink)}
+.files a:hover{border-color:var(--accent)}
+
+/* title slide */
+.title .inner{justify-content:center;gap:28px}
+.byline{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:15px;color:var(--muted)}
+.byline b{color:var(--ink);font-weight:600}
+.fine{font-size:13px;color:var(--muted);max-width:70ch}
+
+/* journey */
+.journey{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;list-style:none;margin:0;padding:0}
+@media (max-width:900px){.journey{grid-template-columns:repeat(2,1fr)}}
+.journey li{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;min-width:0}
+.journey li:hover{border-color:var(--accent)}
+.journey .n{font:700 13px/1 var(--mono);color:var(--accent)}
+.journey h3{font:700 17px/1.2 var(--display)}
+.journey p{margin:0;font-size:13.5px;color:var(--muted)}
+.journey .pc{margin-top:auto;font:500 12px/1 var(--mono);color:var(--muted)}
+
+/* chart */
+.chart{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.chart svg{width:100%;height:auto;display:block}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13.5px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;list-style:none;margin:0;padding:0;counter-reset:s}
+@media (max-width:860px){.pipe{grid-template-columns:1fr}}
+.pipe li{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:14.5px;display:flex;flex-direction:column;gap:6px}
+.pipe code{font:500 12px/1 var(--mono);color:var(--accent)}
+
+/* tables */
+.tw{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font:600 11.5px/1.2 var(--body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* nav */
+.nav{flex:none;display:flex;align-items:center;gap:12px;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--panel)}
+.nav button{border:1px solid var(--line);background:var(--panel-2);border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:600}
+.nav button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px;flex:1;justify-content:center;flex-wrap:wrap}
+.dots button{width:10px;height:10px;padding:0;border-radius:50%;border:0;background:var(--line)}
+.dots button[aria-current="true"]{background:var(--accent);width:24px;border-radius:6px}
+.count{font:500 13px/1 var(--mono);color:var(--muted);min-width:56px;text-align:right}
+</style>
+</head>
+<body>
+<main class="deck" id="deck">
+
+<!-- 1 · Title -->
+<section class="slide title" data-title="Title">
+  <div class="inner">
+    <div class="kicker">Claude Code for PMs · final report</div>
+    <h1>Four responders went silent after 4.2. Here's why, and what we'd build instead.</h1>
+    <p class="lede">Six sessions on one fictional company, Rook Industries. <b>We went from a folder of documents to a root cause in the routing code, a brief and prototype for the Director of Product, and a reusable review skill.</b></p>
+    <div class="byline"><span><b>Manoj Singh</b> · PM, Dispatch</span><span>Cohort ccpm-2026.1</span><span>8 – 27 September 2026</span></div>
+    <p class="fine">Rook Industries is a Product School teaching scenario. It's not a real company. Use ← → or the buttons below to move between slides.</p>
+  </div>
+</section>
+
+<!-- 2 · Journey -->
+<section class="slide" data-title="The six modules">
+  <div class="inner">
+    <div class="kicker">The arc</div>
+    <h2>Six modules, one question: what happened to the responders who stopped being asked?</h2>
+    <ol class="journey" id="journey"></ol>
+    <p class="lede">53 prompts, all in my own words, are saved across the six <code>prompts.md</code> files.</p>
+  </div>
+</section>
+
+<!-- 3 · Module 1 -->
+<section class="slide" data-title="1 · Origin Story">
+  <div class="inner">
+    <div class="kicker"><span class="mod">01</span> Origin Story · Orientation &amp; context</div>
+    <h2>Before any analysis: give Claude the company, once.</h2>
+    <div class="cols">
+      <div class="box">
+        <span class="label">What I built</span>
+        <p><b>CLAUDE.md</b>, a working file written from Rook's own one-pagers, glossary, roadmap and team roster. Every later session starts from it, so nobody re-explains the background. It has grown with each module since.</p>
+      </div>
+      <div class="box">
+        <span class="label">What the documents disagreed on</span>
+        <ul>
+          <li>The Q3 roadmap still lists <b>Availability Confidence</b> as committed to 4.2. It never shipped.</li>
+          <li>The company overview says <b>"monthly releases"</b>. The release history shows gaps of 8–10 weeks.</li>
+          <li>Priya's handover said the dip was <b>"mostly seasonal"</b>.</li>
+        </ul>
+      </div>
+    </div>
+    <pre class="prompt">What's contradictory or missing, not just in the company documents, but across everything in 00-rook?<cite>01-origin-story/prompts.md · #2</cite></pre>
+  </div>
+</section>
+
+<!-- 4 · Module 2 -->
+<section class="slide" data-title="2 · Super-Hearing">
+  <div class="inner">
+    <div class="kicker"><span class="mod">02</span> Super-Hearing · Listening at scale</div>
+    <h2>Two piles of feedback that didn't agree, until we asked how both could be true.</h2>
+    <div class="cols">
+      <div class="box">
+        <span class="label">4 handler interviews</span>
+        <p>Console asks (bigger status text, dark mode, per-responder alert sounds). Then, unprompted, the real story: <b>"phone just sitting there"</b> weeks next to <b>"gone before he could answer"</b> weeks.</p>
+      </div>
+      <div class="box">
+        <span class="label">25 support tickets</span>
+        <ul>
+          <li><b>14</b> quiet or gone silent</li>
+          <li><b>5</b> quiet, then lost the one offer (incl. the only High-severity ticket, T-019)</li>
+          <li><b>4</b> gone before they could answer · <b>2</b> on and off</li>
+        </ul>
+      </div>
+    </div>
+    <div class="corr"><b>Corrected later, with the data:</b> only 2 of the 12 named responders in the tickets show a real drop in their numbers. Two of the four who really collapsed, Vesper and Meteor Mite, have <b>no ticket at all</b>. Their handlers only mentioned them in design interviews.</div>
+    <pre class="prompt">Are there common themes between the Interview and Tickets that is related and any key take aways - give me a table summary<cite>02-super-hearing/prompts.md · #9</cite></pre>
+  </div>
+</section>
+
+<!-- 5 · Module 3 -->
+<section class="slide" data-title="3 · Rewind">
+  <div class="inner">
+    <div class="kicker"><span class="mod">03</span> Rewind · Reading the numbers</div>
+    <h2>The average said "recovering". Broken out by responder, it said four people had disappeared.</h2>
+    <div class="chart">
+      <div id="chart"></div>
+      <div class="legend"><span><i style="background:var(--quiet)"></i>The four who went quiet (avg offers a week)</span><span><i style="background:var(--busy)"></i>The other 12 (avg offers a week)</span></div>
+    </div>
+    <div class="cols">
+      <div class="stat box"><span class="label">Acceptance rate</span><div class="big a">54% → 73%</div><span>Release week to 31 Aug. It looked like a recovery. Really, the four stopped being counted.</span></div>
+      <div class="stat box"><span class="label">Went quiet</span><div class="big q">4 of 16</div><span>Farlight, The Undertow, Vesper, Meteor Mite: down 79–89%</span></div>
+      <div class="stat box"><span class="label">Got busier</span><div class="big b">10 of 16</div><span>Up 17–46%. The Gale and Nightwell reached 21 offers a week.</span></div>
+    </div>
+    <pre class="prompt">Once somebody's gone quite, what should be done to have them to start getting pinged again<cite>03-rewind/prompts.md · #11</cite></pre>
+  </div>
+</section>
+
+<!-- 6 · Module 4 -->
+<section class="slide" data-title="4 · X-Ray Vision">
+  <div class="inner">
+    <div class="kicker"><span class="mod">04</span> X-Ray Vision · Debugging code</div>
+    <h2>In the whole routing code, points come off one way and go back on one way.</h2>
+    <ol class="pipe">
+      <li><b>Who's free nearby</b><code>availability.py</code></li>
+      <li><b>Put them in order</b> 60% distance · 25% said yes lately · 15% skills<code>routing.py</code></li>
+      <li><b>Buzz the top person</b> 60 s to answer (was 90)<code>offer.py</code></li>
+      <li><b>Yes: +8 · anything else: −12</b> a miss counts as a no<code>history.py</code></li>
+      <li><b>Next person down</b> first yes wins<code>offer.py</code></li>
+    </ol>
+    <div class="cols">
+      <div class="box">
+        <span class="label">What it means</span>
+        <p><b>Nothing</b> puts points back with time. Wen asked about this in 2019, and it was "left as-is". From zero, it takes <b>~13 yeses in a row</b> to get level, and every yes needs an offer that someone at the bottom rarely gets.</p>
+      </div>
+      <div class="box">
+        <span class="label">Marcus's 14 Aug question, answered</span>
+        <p>Was the change meant for responders who keep turning jobs down? <b>No. It fell out that way.</b> Before 4.2, Vesper had the <b>2nd-best record of all 16</b>. The four shared one bad release week (36–50% taken), not a habit.</p>
+      </div>
+    </div>
+    <div class="corr"><b>Correction:</b> 4.2's reweight <i>softened</i> a low score's effect (~40 → ~19 min of travel "penalty"). The likely trigger is the 60 s timer. The root cause is older scoring that can't recover.</div>
+  </div>
+</section>
+
+<!-- 7 · Module 5 -->
+<section class="slide" data-title="5 · Super-Speed">
+  <div class="inner">
+    <div class="kicker"><span class="mod">05</span> Super-Speed · Building without coding</div>
+    <h2>Helen asked for more than a number change. Back in Rotation is what we'd build instead.</h2>
+    <div class="cols">
+      <div class="box">
+        <span class="label">Three pieces, shipped together</span>
+        <ul>
+          <li><b>Being quiet gets you asked.</b> Available but no offer in 7 days: next matching callout comes to you first.</li>
+          <li><b>A bad stretch fades with time.</b> Scores drift back toward neutral.</li>
+          <li><b>Missing isn't refusing.</b> A timeout costs less than a decline.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <span class="label">Deliberately doesn't</span>
+        <ul>
+          <li>undo 4.2 or change the 60 s timer</li>
+          <li>equalise workload or set quotas</li>
+          <li>override someone choosing to step back</li>
+          <li>add a setting, or touch the availability record that Supply reads</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box">
+      <span class="label">What changes for people</span>
+      <p><b>Kip</b> stops telling Mite to "hang in there", because the card says why and what happens next. <b>Meteor Mite</b> sees "You're back in rotation" instead of silence.</p>
+    </div>
+    <div class="files">
+      <a href="05-super-speed/back-in-rotation-brief.md">back-in-rotation-brief.md</a>
+      <a href="05-super-speed/back-in-rotation-mock.html">back-in-rotation-mock.html ↗ clickable</a>
+      <a href="05-super-speed/current-state-reconstruction.html">current-state-reconstruction.html</a>
+    </div>
+  </div>
+</section>
+
+<!-- 8 · Module 6 -->
+<section class="slide" data-title="6 · Sidekicks">
+  <div class="inner">
+    <div class="kicker"><span class="mod">06</span> Sidekicks · Building your own skills</div>
+    <h2>My review habits, written once as a skill and run on every brief.</h2>
+    <div class="cols">
+      <div class="box">
+        <span class="label"><code>review-checklist</code>: five checks</span>
+        <ul>
+          <li>Named owner, a person, not a team</li>
+          <li>Created date <b>and</b> time</li>
+          <li>How we'll know it worked</li>
+          <li>Scope at the end matches the start</li>
+          <li>Problem explained before the fix</li>
+        </ul>
+      </div>
+      <div class="box">
+        <span class="label">Run on my own brief</span>
+        <div class="big q">2 / 5 → <span style="color:var(--ok)">5 / 5</span></div>
+        <p>It caught the missing owner, the missing time, and "three pieces" meaning three different things in three places.</p>
+      </div>
+      <div class="box">
+        <span class="label">Also built</span>
+        <ul>
+          <li><code>save-pm-work</code>: the end-of-session wrap-up as one command</li>
+          <li>A scheduled review of every brief, Mon 28 Sep at 8:00 AM ET, tested with two runs</li>
+        </ul>
+      </div>
+    </div>
+    <pre class="prompt">… Turn that into a skill called review-checklist, so I can point it to a document<cite>06-sidekicks/prompts.md · #3</cite></pre>
+  </div>
+</section>
+
+<!-- 9 · Open items -->
+<section class="slide" data-title="What's next">
+  <div class="inner">
+    <div class="kicker">What's still open</div>
+    <h2>A strong hypothesis, not a verdict. Here's who closes each gap.</h2>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Who</th><th>What</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag">Wen</span></td><td>Confirm the scoring mechanism (medium confidence: no score history is logged). Were the release-week misses timeouts or real declines? Why did Sgt. Bulwark survive a week as bad as Vesper's?</td></tr>
+          <tr><td><span class="tag">Helen</span></td><td>Decide: hold the quick fix and ship all three pieces together; High-severity callouts skip re-entry; one-time reset of the four scores.</td></tr>
+          <tr><td><span class="tag">Marcus</span></td><td>Post the answer to the 14 Aug thread. Is the override audit log in 4.0 real? It's not in the routing code.</td></tr>
+          <tr><td><span class="tag">Nadia</span></td><td>Vesper and Meteor Mite have no tickets. Support should hear about them before handlers see new copy.</td></tr>
+          <tr><td><span class="tag">Sofia</span></td><td>Real console and phone screenshots, to replace the reconstruction.</td></tr>
+          <tr><td><span class="tag q">Me</span></td><td>Fix the reweight line in <code>routing-spiral-memo.md</code>, and confirm whether the 7-day trigger actually fires for Meteor Mite.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lede"><b>The lesson I'll keep:</b> an average can recover while the people inside it get worse. Break the number out, ask for the rows, then go and read the code that produced them.</p>
+  </div>
+</section>
+
+</main>
+
+<nav class="nav" aria-label="Slides">
+  <button id="prev" aria-label="Previous slide">←</button>
+  <div class="dots" id="dots"></div>
+  <span class="count" id="count"></span>
+  <button id="next" aria-label="Next slide">→</button>
+</nav>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var i=0;
+
+  // Journey tiles
+  var MODS=[
+    ['01','Origin Story','CLAUDE.md from Rook\'s own documents',2],
+    ['02','Super-Hearing','Where the interviews and tickets disagree',10],
+    ['03','Rewind','The number behind the story',11],
+    ['04','X-Ray Vision','What the routing code does',9],
+    ['05','Super-Speed','Brief and clickable prototype',9],
+    ['06','Sidekicks','review-checklist skill',12]
+  ];
+  document.getElementById('journey').innerHTML=MODS.map(function(m,k){
+    return '<li data-go="'+(k+2)+'" tabindex="0"><span class="n">'+m[0]+'</span><h3>'+m[1]+'</h3><p>'+m[2]+'</p><span class="pc">'+m[3]+' prompts</span></li>';
+  }).join('');
+
+  // Chart: avg weekly offers, callout-history.csv
+  var WEEKS=['29 Jun','6 Jul','13 Jul','20 Jul','27 Jul','3 Aug','10 Aug','17 Aug','24 Aug','31 Aug'];
+  var QUIET=[12.25,12,12,12.5,12.5,12.25,10.75,4,1.5,0.75];
+  var OTHERS=[10.2,10.2,10.5,10.5,10.0,10.2,11.2,11.8,13.0,13.5];
+  (function(){
+    var W=900,H=260,L=40,R=16,T=14,B=34,max=15;
+    var x=function(k){return L+k*(W-L-R)/(WEEKS.length-1)};
+    var y=function(v){return T+(1-v/max)*(H-T-B)};
+    var g='';
+    [0,5,10,15].forEach(function(t){
+      g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(t)+'" y2="'+y(t)+'" stroke="var(--line)"/>';
+      g+='<text x="'+(L-8)+'" y="'+(y(t)+4)+'" text-anchor="end" font-size="12" fill="var(--muted)" font-family="var(--mono)">'+t+'</text>';
+    });
+    var rx=(x(6)+x(7))/2-((x(7)-x(6))*0.2);
+    g+='<line x1="'+x(6)+'" x2="'+x(6)+'" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--muted)" stroke-dasharray="4 4"/>';
+    g+='<text x="'+(x(6)+6)+'" y="'+(T+12)+'" font-size="12" fill="var(--muted)" font-family="var(--body)">4.2 ships 12 Aug</text>';
+    WEEKS.forEach(function(w,k){ if(k%3===0||k===WEEKS.length-1) g+='<text x="'+x(k)+'" y="'+(H-10)+'" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="var(--mono)">'+w+'</text>'; });
+    function line(data,color){
+      var d=data.map(function(v,k){return (k?'L':'M')+x(k).toFixed(1)+' '+y(v).toFixed(1)}).join(' ');
+      var last=data.length-1;
+      return '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>'+
+        '<circle cx="'+x(last)+'" cy="'+y(data[last])+'" r="5" fill="'+color+'"/>'+
+        '<text x="'+(x(last)-8)+'" y="'+(y(data[last])-10)+'" text-anchor="end" font-size="13" font-weight="700" fill="'+color+'" font-family="var(--mono)">'+data[last]+'</text>';
+    }
+    g+=line(OTHERS,'var(--busy)')+line(QUIET,'var(--quiet)');
+    document.getElementById('chart').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Average weekly offers: the four quiet responders fell from about 12 to 0.75 after 4.2 while the other 12 rose from about 10 to 13.5">'+g+'</svg>';
+  })();
+
+  // Navigation
+  var dots=document.getElementById('dots');
+  dots.innerHTML=slides.map(function(s,k){return '<button data-go="'+k+'" aria-label="Slide '+(k+1)+': '+s.dataset.title+'"></button>'}).join('');
+  function show(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('on',k===i)});
+    [].forEach.call(dots.children,function(d,k){d.setAttribute('aria-current',k===i)});
+    document.getElementById('count').textContent=(i+1)+' / '+slides.length;
+    document.getElementById('prev').disabled=i===0;
+    document.getElementById('next').disabled=i===slides.length-1;
+    slides[i].scrollTop=0;
+  }
+  document.getElementById('prev').onclick=function(){show(i-1)};
+  document.getElementById('next').onclick=function(){show(i+1)};
+  document.addEventListener('click',function(e){var t=e.target.closest('[data-go]');if(t)show(+t.dataset.go)});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||(e.key===' '&&!e.target.closest('button,a'))){e.preventDefault();show(i+1)}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();show(i-1)}
+    else if(e.key==='Home'){show(0)} else if(e.key==='End'){show(slides.length-1)}
+    else if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.go){show(+e.target.dataset.go)}
+  });
+  var tx=null;
+  document.getElementById('deck').addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+  document.getElementById('deck').addEventListener('touchend',function(e){if(tx===null)return;var dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>60)show(i+(dx<0?1:-1));tx=null},{passive:true});
+  var m=/^#s(\d+)$/.exec(location.hash);
+  show(m?+m[1]-1:0);
+})();
+</script>
+</body>
+</html>
